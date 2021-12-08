@@ -13,31 +13,43 @@ impl Solver for Day {
     }
 }
 
-fn solve(days: i64, mut fish: Vec<i64>) -> i64 {
+#[derive(Debug, Eq, PartialEq)]
+struct Fish {
+    timer: i64,
+    number: i64,
+}
+
+fn solve(days: i64, mut fish: Vec<Fish>) -> i64 {
     if days < 1 {
-        fish.len() as i64
-    } else {
-        let new_fish: Vec<i64> = fish
+        fish
             .iter()
-            .filter(|fishy| **fishy == 0)
-            .map(|_| 8)
-            .collect();
+            .map(|f| f.number)
+            .reduce(|a, b| a + b)
+            .unwrap()
+    } else {
+        let new_fish: Option<Fish> = fish
+            .iter()
+            .filter(|fishy| fishy.timer == 0)
+            .map(|fishy| Fish { timer: 8, number: fishy.number })
+            .reduce(|a, b| Fish { timer: 8, number: a.number + b.number });
         for i in 0..fish.len() {
-            let fishy = fish[i];
-            let new_val = fishy - 1;
-            let new_val = if new_val >= 0 { new_val } else { 6 };
-            fish[i] = new_val;
+            let mut fishy = fish.get_mut(i).unwrap();
+            let new_timer = fishy.timer - 1;
+            let new_timer = if new_timer >= 0 { new_timer } else { 6 };
+            fishy.timer = new_timer;
         }
-        for fishy in new_fish {
-            fish.push(fishy)
+        if new_fish.is_some() {
+            fish.push(new_fish.unwrap())
         }
+
         solve(days - 1, fish)
     }
 }
 
-fn fish(inp: &str) -> Vec<i64> {
+fn fish(inp: &str) -> Vec<Fish> {
     inp.split(",")
         .map(|v| i64::from_str_radix(v, 10).unwrap())
+        .map(|v| Fish { timer: v, number: 1 })
         .collect()
 }
 
@@ -56,7 +68,7 @@ mod tests {
     #[test]
     fn test_fish() {
         assert_eq!(
-            vec![3, 4, 3, 1, 2],
+            vec![3, 4, 3, 1, 2].iter().map(|v| Fish { timer: *v, number: 1 }).collect::<Vec<Fish>>(),
             fish(example_input())
         )
     }
@@ -81,13 +93,13 @@ mod tests {
         assert_eq!(Day {}.pt1(input()), "373378")
     }
 
-    // #[test]
-    // fn test_pt2_example() {
-    //     assert_eq!(Day {}.pt2(example_input()), "26984457539")
-    // }
-    //
-    // #[test]
-    // fn test_pt2() {
-    //     assert_eq!(Day {}.pt2(input()), "!")
-    // }
+    #[test]
+    fn test_pt2_example() {
+        assert_eq!(Day {}.pt2(example_input()), "26984457539")
+    }
+
+    #[test]
+    fn test_pt2() {
+        assert_eq!(Day {}.pt2(input()), "1682576647495")
+    }
 }
