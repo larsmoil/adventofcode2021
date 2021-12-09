@@ -20,7 +20,7 @@ fn fuel_between(a: i64, b: i64, fuel_cost: &FuelCost) -> i64 {
     let distance = (a - b).abs();
     match fuel_cost {
         FuelCost::Constant => distance,
-        FuelCost::Increasing => (1..=distance).sum()
+        FuelCost::Increasing => (distance + 1).pow(2) / 2 - (distance + 1) / 2,
     }
 }
 
