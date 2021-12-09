@@ -32,17 +32,15 @@ fn align(inp: &str, fuel_cost: &FuelCost) -> i64 {
     coordinates.sort_unstable();
     let coordinate_extremes: (i64, i64) = (*coordinates.first().unwrap(), *coordinates.last().unwrap());
 
-    let mut costs: Vec<i64> = vec![];
-    for candidate in coordinate_extremes.0..=coordinate_extremes.1 {
-        costs.push(
+    (coordinate_extremes.0..=coordinate_extremes.1)
+        .into_iter()
+        .map(|candidate|
             coordinates
                 .iter()
                 .map(|coordinate| fuel_between(*coordinate, candidate, fuel_cost))
-                .sum()
-        );
-    }
-    costs.sort_unstable();
-    *costs.first().unwrap()
+                .sum())
+        .min()
+        .unwrap()
 }
 
 pub(crate) fn input() -> &'static str {

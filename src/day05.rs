@@ -9,22 +9,21 @@ type Line = (Point, Point);
 
 impl Solver for Day {
     fn pt1(&self, inp: &str) -> String {
-        let lines = hor_vert_lines(lines(inp));
-        solve(lines).to_string()
+        let lines: Vec<Line> = lines(inp).iter().filter(|line| hor_vert_line(line)).copied().collect();
+        solve(&lines).to_string()
     }
     fn pt2(&self, inp: &str) -> String {
-        let hor_vert_lines = hor_vert_lines(lines(inp));
-        let diagonal_lines = diagonal_lines(lines(inp));
-        let lines = vec![hor_vert_lines, diagonal_lines].iter()
-            .flat_map(|a| a.iter())
-            .map(|v| v.to_owned())
+        let lines: Vec<Line> = lines(inp)
+            .iter()
+            .filter(|line| hor_vert_line(line) || diagonal_line(line))
+            .copied()
             .collect();
-        solve(lines).to_string()
+        solve(&lines).to_string()
     }
 }
 
-fn solve(lines: Vec<Line>) -> i64 {
-    let map = map(&lines);
+fn solve(lines: &[Line]) -> i64 {
+    let map = map(lines);
     let x_min = map.0.0;
     let x_max = map.0.1;
     let xs = x_max - x_min + 1;
@@ -61,33 +60,21 @@ fn lines(inp: &str) -> Vec<Line> {
                     (x, y)
                 })
                 .collect();
-            let line: (Point, Point) = (coordinates[0], coordinates[1]);
+            let line: Line = (coordinates[0], coordinates[1]);
             line
         })
         .collect()
 }
 
-fn diagonal_lines(lines: Vec<Line>) -> Vec<Line> {
-    lines
-        .iter()
-        .filter(|line| {
-            let x1 = min(line.0.0, line.1.0);
-            let x2 = max(line.0.0, line.1.0);
-            let y1 = min(line.0.1, line.1.1);
-            let y2 = max(line.0.1, line.1.1);
+fn diagonal_line(line: &Line) -> bool {
+    let delta_x = (line.0.0 - line.1.0 as i64).abs();
+    let delta_y = (line.0.1 - line.1.1 as i64).abs();
 
-            ((x2 - x1) as i64).abs() == ((y2 - y1) as i64).abs()
-        })
-        .copied()
-        .collect()
+    delta_x == delta_y
 }
 
-fn hor_vert_lines(lines: Vec<Line>) -> Vec<Line> {
-    lines
-        .iter()
-        .filter(|line| line.0.0 == line.1.0 || line.0.1 == line.1.1)
-        .copied()
-        .collect()
+fn hor_vert_line(line: &Line) -> bool {
+    line.0.0 == line.1.0 || line.0.1 == line.1.1
 }
 
 
@@ -147,7 +134,7 @@ mod tests {
     }
 
     #[test]
-    fn test_diagonal_lines() {
+    fn test_diagonal_line() {
         assert_eq!(
             vec![
                 ((8, 0), (0, 8)),
@@ -155,12 +142,12 @@ mod tests {
                 ((0, 0), (8, 8)),
                 ((5, 5), (8, 2)),
             ],
-            diagonal_lines(lines(example_input()))
+            lines(example_input()).iter().filter(|line| diagonal_line(line)).copied().collect::<Vec<Line>>()
         )
     }
 
     #[test]
-    fn test_hor_vert_lines() {
+    fn test_hor_vert_line() {
         assert_eq!(
             vec![
                 ((0, 9), (5, 9)),
@@ -170,7 +157,7 @@ mod tests {
                 ((0, 9), (2, 9)),
                 ((3, 4), (1, 4)),
             ],
-            hor_vert_lines(lines(example_input()))
+            lines(example_input()).iter().filter(|line| hor_vert_line(line)).copied().collect::<Vec<Line>>()
         );
     }
 
