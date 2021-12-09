@@ -42,7 +42,7 @@ impl Solver for Day {
 
 fn measurements(inp: &str) -> Vec<i32> {
     inp
-        .split("\n")
+        .split('\n')
         .map(|a| a.parse::<i32>().unwrap())
         .collect()
 }

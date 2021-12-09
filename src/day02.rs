@@ -15,16 +15,16 @@ impl Solver for Day {
 
 fn course_adjustments(inp: &str) -> Vec<(i32, i32)> {
     inp
-        .split("\n")
+        .split('\n')
         .map(|a| {
-            let split = a.split(" ").collect::<Vec<&str>>();
+            let split = a.split(' ').collect::<Vec<&str>>();
             let direction = split.first().unwrap();
             let amount = split.last().unwrap();
             let amount = amount.parse::<i32>().unwrap();
-            match direction {
-                &"forward" => (amount, 0),
-                &"up" => (0, -amount),
-                &"down" => (0, amount),
+            match *direction {
+                "forward" => (amount, 0),
+                "up" => (0, -amount),
+                "down" => (0, amount),
                 _ => panic!("Unknown direction: '{}'!", direction)
             }
         })

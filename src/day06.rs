@@ -38,8 +38,8 @@ fn solve(days: i64, mut fish: Vec<Fish>) -> i64 {
             let new_timer = if new_timer >= 0 { new_timer } else { 6 };
             fishy.timer = new_timer;
         }
-        if new_fish.is_some() {
-            fish.push(new_fish.unwrap())
+        if let Some(new_fish) = new_fish {
+            fish.push(new_fish)
         }
 
         solve(days - 1, fish)
@@ -47,8 +47,8 @@ fn solve(days: i64, mut fish: Vec<Fish>) -> i64 {
 }
 
 fn fish(inp: &str) -> Vec<Fish> {
-    inp.split(",")
-        .map(|v| i64::from_str_radix(v, 10).unwrap())
+    inp.split(',')
+        .map(|v| v.parse::<i64>().unwrap())
         .map(|v| Fish { timer: v, number: 1 })
         .collect()
 }

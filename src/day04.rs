@@ -32,8 +32,8 @@ struct Board {
 impl Board {
     fn draw(&mut self, number: u32) -> Option<u32> {
         let my_number = self.numbers.iter().enumerate().find(|(_, e)| e.0 == number);
-        if my_number.is_some() {
-            let index = my_number.unwrap().0;
+        if let Some(my_number) = my_number {
+            let index = my_number.0;
             self.numbers[index].1 = true;
         }
 
@@ -42,8 +42,7 @@ impl Board {
             .flat_map(|a| a.iter())
             .map(|v| v.to_owned())
             .filter(|row_or_col| row_or_col.iter().all(|n| n.1))
-            .collect::<Vec<Vec<(u32, bool)>>>()
-            .len() > 0;
+            .count() > 0;
 
         self.score()
     }
@@ -72,7 +71,7 @@ impl Board {
     fn cols(&self) -> Vec<Vec<(u32, bool)>> {
         let mut cols: Vec<Vec<(u32, bool)>> = vec![];
         for column in 0..self.dimensions() {
-            cols.push(self.numbers.iter().skip(column as usize).step_by(self.dimensions() as usize).map(|v| *v).collect());
+            cols.push(self.numbers.iter().skip(column as usize).step_by(self.dimensions() as usize).copied().collect());
         }
         cols
     }
@@ -91,15 +90,14 @@ impl Game {
             for i in 0..self.boards.len() {
                 let board = self.boards.get_mut(i).unwrap();
                 let board_score = board.draw(*number);
-                let unfinished_boards = self.boards.iter().filter(|board| !board.solved).collect::<Vec<&Board>>().len();
+                let unfinished_boards = self.boards.iter().filter(|board| !board.solved).count();
 
                 match board_score {
                     None => {}
                     Some(score) => match winner {
                         None => winner = Option::Some(number * score),
-                        Some(_) => match unfinished_boards {
-                            0 => return Some((winner.unwrap(), number * score)),
-                            _ => {}
+                        Some(_) => if unfinished_boards == 0 {
+                            return Some((winner.unwrap(), number * score));
                         }
                     }
                 }
@@ -111,18 +109,18 @@ impl Game {
     fn new(inp: &str) -> Game {
         let (numbers, boards) = inp.split_once("\n\n").unwrap();
         let numbers = numbers
-            .split(",")
-            .map(|v| u32::from_str_radix(v, 10).unwrap())
+            .split(',')
+            .map(|v| v.parse::<u32>().unwrap())
             .collect();
         let board_numbers: Vec<Vec<(u32, bool)>> = boards
             .split("\n\n")
             .map(|board| {
                 let board_numbers: Vec<(u32, bool)> = board
-                    .split("\n")
+                    .split('\n')
                     .map(|row|
                         row
                             .split_whitespace()
-                            .map(|num| (u32::from_str_radix(num, 10).unwrap(), false))
+                            .map(|num| (num.parse::<u32>().unwrap(), false))
                     )
                     .flatten()
                     .collect();

@@ -11,7 +11,7 @@ impl Solver for Day {
     fn pt2(&self, inp: &str) -> String {
         let basins = basins(&map(inp));
         let mut sizes: Vec<usize> = basins.iter().map(|basin| basin.len()).collect();
-        sizes.sort();
+        sizes.sort_unstable();
         sizes.reverse();
         sizes[..3].iter().product::<usize>().to_string()
     }
@@ -57,7 +57,7 @@ fn basin(map: &Map, point: i16) -> Vec<i16> {
             .flat_map(|a| basin(map, *a))
             .collect(),
     ].concat();
-    basin.sort();
+    basin.sort_unstable();
     basin.dedup();
     basin
 }
@@ -75,8 +75,8 @@ fn low_points(map: &Map) -> Vec<i16> {
         .iter()
         .enumerate()
         .filter(|(i, e)| {
-            let (row, column) = row_column(&map, i);
-            let adjacent = adjacent(row, column, &map);
+            let (row, column) = row_column(map, i);
+            let adjacent = adjacent(row, column, map);
             adjacent.iter().all(|a| map.values[*a as usize] > **e)
         })
         .map(|(i, _)| i as i16)
@@ -88,10 +88,10 @@ fn row_column(map: &Map, point: &usize) -> (i16, i16) {
 }
 
 fn map(inp: &str) -> Map {
-    let lines: Vec<&str> = inp.split("\n").collect();
+    let lines: Vec<&str> = inp.split('\n').collect();
     let height = lines.len() as i16;
     let width = lines.first().unwrap().len() as i16;
-    let values: Vec<i16> = lines.iter().flat_map(|s| s.chars().map(|c| i16::from_str_radix(&c.to_string(), 10).unwrap()).collect::<Vec<i16>>()).collect();
+    let values: Vec<i16> = lines.iter().flat_map(|s| s.chars().map(|c| c.to_string().parse::<i16>().unwrap()).collect::<Vec<i16>>()).collect();
     Map {
         width,
         height,

@@ -4,32 +4,32 @@ pub struct Day {}
 
 impl Solver for Day {
     fn pt1(&self, inp: &str) -> String {
-        align(inp, &FuelCost::CONSTANT).to_string()
+        align(inp, &FuelCost::Constant).to_string()
     }
     fn pt2(&self, inp: &str) -> String {
-        align(inp, &FuelCost::INCREASING).to_string()
+        align(inp, &FuelCost::Increasing).to_string()
     }
 }
 
 enum FuelCost {
-    CONSTANT,
-    INCREASING,
+    Constant,
+    Increasing,
 }
 
 fn fuel_between(a: i64, b: i64, fuel_cost: &FuelCost) -> i64 {
     let distance = (a - b).abs();
     match fuel_cost {
-        FuelCost::CONSTANT => distance,
-        FuelCost::INCREASING => (1..=distance).sum()
+        FuelCost::Constant => distance,
+        FuelCost::Increasing => (1..=distance).sum()
     }
 }
 
 fn align(inp: &str, fuel_cost: &FuelCost) -> i64 {
     let mut coordinates: Vec<i64> = inp
-        .split(",")
-        .map(|v| i64::from_str_radix(v, 10).unwrap())
+        .split(',')
+        .map(|v| v.parse::<i64>().unwrap())
         .collect();
-    coordinates.sort();
+    coordinates.sort_unstable();
     let coordinate_extremes: (i64, i64) = (*coordinates.first().unwrap(), *coordinates.last().unwrap());
 
     let mut costs: Vec<i64> = vec![];
@@ -37,11 +37,11 @@ fn align(inp: &str, fuel_cost: &FuelCost) -> i64 {
         costs.push(
             coordinates
                 .iter()
-                .map(|coordinate| fuel_between(*coordinate, candidate, &fuel_cost))
+                .map(|coordinate| fuel_between(*coordinate, candidate, fuel_cost))
                 .sum()
         );
     }
-    costs.sort();
+    costs.sort_unstable();
     *costs.first().unwrap()
 }
 
@@ -69,50 +69,50 @@ mod tests {
 
     #[test]
     fn test_fuel_between() {
-        assert_eq!(14, fuel_between(16, 2, &FuelCost::CONSTANT));
-        assert_eq!(1, fuel_between(1, 2, &FuelCost::CONSTANT));
-        assert_eq!(0, fuel_between(2, 2, &FuelCost::CONSTANT));
-        assert_eq!(2, fuel_between(0, 2, &FuelCost::CONSTANT));
-        assert_eq!(2, fuel_between(4, 2, &FuelCost::CONSTANT));
-        assert_eq!(0, fuel_between(2, 2, &FuelCost::CONSTANT));
-        assert_eq!(5, fuel_between(7, 2, &FuelCost::CONSTANT));
-        assert_eq!(1, fuel_between(1, 2, &FuelCost::CONSTANT));
-        assert_eq!(0, fuel_between(2, 2, &FuelCost::CONSTANT));
-        assert_eq!(12, fuel_between(14, 2, &FuelCost::CONSTANT));
+        assert_eq!(14, fuel_between(16, 2, &FuelCost::Constant));
+        assert_eq!(1, fuel_between(1, 2, &FuelCost::Constant));
+        assert_eq!(0, fuel_between(2, 2, &FuelCost::Constant));
+        assert_eq!(2, fuel_between(0, 2, &FuelCost::Constant));
+        assert_eq!(2, fuel_between(4, 2, &FuelCost::Constant));
+        assert_eq!(0, fuel_between(2, 2, &FuelCost::Constant));
+        assert_eq!(5, fuel_between(7, 2, &FuelCost::Constant));
+        assert_eq!(1, fuel_between(1, 2, &FuelCost::Constant));
+        assert_eq!(0, fuel_between(2, 2, &FuelCost::Constant));
+        assert_eq!(12, fuel_between(14, 2, &FuelCost::Constant));
 
-        assert_eq!(14, fuel_between(2, 16, &FuelCost::CONSTANT));
-        assert_eq!(1, fuel_between(2, 1, &FuelCost::CONSTANT));
-        assert_eq!(0, fuel_between(2, 2, &FuelCost::CONSTANT));
-        assert_eq!(2, fuel_between(2, 0, &FuelCost::CONSTANT));
-        assert_eq!(2, fuel_between(2, 4, &FuelCost::CONSTANT));
-        assert_eq!(0, fuel_between(2, 2, &FuelCost::CONSTANT));
-        assert_eq!(5, fuel_between(2, 7, &FuelCost::CONSTANT));
-        assert_eq!(1, fuel_between(2, 1, &FuelCost::CONSTANT));
-        assert_eq!(0, fuel_between(2, 2, &FuelCost::CONSTANT));
-        assert_eq!(12, fuel_between(2, 14, &FuelCost::CONSTANT));
+        assert_eq!(14, fuel_between(2, 16, &FuelCost::Constant));
+        assert_eq!(1, fuel_between(2, 1, &FuelCost::Constant));
+        assert_eq!(0, fuel_between(2, 2, &FuelCost::Constant));
+        assert_eq!(2, fuel_between(2, 0, &FuelCost::Constant));
+        assert_eq!(2, fuel_between(2, 4, &FuelCost::Constant));
+        assert_eq!(0, fuel_between(2, 2, &FuelCost::Constant));
+        assert_eq!(5, fuel_between(2, 7, &FuelCost::Constant));
+        assert_eq!(1, fuel_between(2, 1, &FuelCost::Constant));
+        assert_eq!(0, fuel_between(2, 2, &FuelCost::Constant));
+        assert_eq!(12, fuel_between(2, 14, &FuelCost::Constant));
 
 
-        assert_eq!(66, fuel_between(16, 5, &FuelCost::INCREASING));
-        assert_eq!(10, fuel_between(1, 5, &FuelCost::INCREASING));
-        assert_eq!(6, fuel_between(2, 5, &FuelCost::INCREASING));
-        assert_eq!(15, fuel_between(0, 5, &FuelCost::INCREASING));
-        assert_eq!(1, fuel_between(4, 5, &FuelCost::INCREASING));
-        assert_eq!(6, fuel_between(2, 5, &FuelCost::INCREASING));
-        assert_eq!(3, fuel_between(7, 5, &FuelCost::INCREASING));
-        assert_eq!(10, fuel_between(1, 5, &FuelCost::INCREASING));
-        assert_eq!(6, fuel_between(2, 5, &FuelCost::INCREASING));
-        assert_eq!(45, fuel_between(14, 5, &FuelCost::INCREASING));
+        assert_eq!(66, fuel_between(16, 5, &FuelCost::Increasing));
+        assert_eq!(10, fuel_between(1, 5, &FuelCost::Increasing));
+        assert_eq!(6, fuel_between(2, 5, &FuelCost::Increasing));
+        assert_eq!(15, fuel_between(0, 5, &FuelCost::Increasing));
+        assert_eq!(1, fuel_between(4, 5, &FuelCost::Increasing));
+        assert_eq!(6, fuel_between(2, 5, &FuelCost::Increasing));
+        assert_eq!(3, fuel_between(7, 5, &FuelCost::Increasing));
+        assert_eq!(10, fuel_between(1, 5, &FuelCost::Increasing));
+        assert_eq!(6, fuel_between(2, 5, &FuelCost::Increasing));
+        assert_eq!(45, fuel_between(14, 5, &FuelCost::Increasing));
 
-        assert_eq!(66, fuel_between(5, 16, &FuelCost::INCREASING));
-        assert_eq!(10, fuel_between(5, 1, &FuelCost::INCREASING));
-        assert_eq!(6, fuel_between(5, 2, &FuelCost::INCREASING));
-        assert_eq!(15, fuel_between(5, 0, &FuelCost::INCREASING));
-        assert_eq!(1, fuel_between(5, 4, &FuelCost::INCREASING));
-        assert_eq!(6, fuel_between(5, 2, &FuelCost::INCREASING));
-        assert_eq!(3, fuel_between(5, 7, &FuelCost::INCREASING));
-        assert_eq!(10, fuel_between(5, 1, &FuelCost::INCREASING));
-        assert_eq!(6, fuel_between(5, 2, &FuelCost::INCREASING));
-        assert_eq!(45, fuel_between(5, 14, &FuelCost::INCREASING));
+        assert_eq!(66, fuel_between(5, 16, &FuelCost::Increasing));
+        assert_eq!(10, fuel_between(5, 1, &FuelCost::Increasing));
+        assert_eq!(6, fuel_between(5, 2, &FuelCost::Increasing));
+        assert_eq!(15, fuel_between(5, 0, &FuelCost::Increasing));
+        assert_eq!(1, fuel_between(5, 4, &FuelCost::Increasing));
+        assert_eq!(6, fuel_between(5, 2, &FuelCost::Increasing));
+        assert_eq!(3, fuel_between(5, 7, &FuelCost::Increasing));
+        assert_eq!(10, fuel_between(5, 1, &FuelCost::Increasing));
+        assert_eq!(6, fuel_between(5, 2, &FuelCost::Increasing));
+        assert_eq!(45, fuel_between(5, 14, &FuelCost::Increasing));
     }
 
     #[test]

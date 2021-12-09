@@ -4,6 +4,9 @@ use crate::problem::Solver;
 
 pub struct Day {}
 
+type Point = (i64, i64);
+type Line = (Point, Point);
+
 impl Solver for Day {
     fn pt1(&self, inp: &str) -> String {
         let lines = hor_vert_lines(lines(inp));
@@ -20,7 +23,7 @@ impl Solver for Day {
     }
 }
 
-fn solve(lines: Vec<((i64, i64), (i64, i64))>) -> i64 {
+fn solve(lines: Vec<Line>) -> i64 {
     let map = map(&lines);
     let x_min = map.0.0;
     let x_max = map.0.1;
@@ -42,29 +45,29 @@ fn solve(lines: Vec<((i64, i64), (i64, i64))>) -> i64 {
     let at_least_twice = points
         .iter()
         .filter(|point| **point > 1)
-        .collect::<Vec<&i64>>();
-    at_least_twice.len() as i64
+        .count();
+    at_least_twice as i64
 }
 
-fn lines(inp: &str) -> Vec<((i64, i64), (i64, i64))> {
+fn lines(inp: &str) -> Vec<Line> {
     inp
-        .split("\n")
+        .split('\n')
         .map(|line| {
-            let coordinates: Vec<(i64, i64)> = line
+            let coordinates: Vec<Point> = line
                 .split(" -> ")
                 .map(|coordinate| {
-                    let points: Vec<i64> = coordinate.split(",").map(|point| i64::from_str_radix(point, 10).unwrap()).collect();
+                    let points: Vec<i64> = coordinate.split(',').map(|point| point.parse::<i64>().unwrap()).collect();
                     let (x, y) = (points[0], points[1]);
                     (x, y)
                 })
                 .collect();
-            let line: ((i64, i64), (i64, i64)) = (coordinates[0], coordinates[1]);
+            let line: (Point, Point) = (coordinates[0], coordinates[1]);
             line
         })
         .collect()
 }
 
-fn diagonal_lines(lines: Vec<((i64, i64), (i64, i64))>) -> Vec<((i64, i64), (i64, i64))> {
+fn diagonal_lines(lines: Vec<Line>) -> Vec<Line> {
     lines
         .iter()
         .filter(|line| {
@@ -75,29 +78,29 @@ fn diagonal_lines(lines: Vec<((i64, i64), (i64, i64))>) -> Vec<((i64, i64), (i64
 
             ((x2 - x1) as i64).abs() == ((y2 - y1) as i64).abs()
         })
-        .map(|l| *l)
+        .copied()
         .collect()
 }
 
-fn hor_vert_lines(lines: Vec<((i64, i64), (i64, i64))>) -> Vec<((i64, i64), (i64, i64))> {
+fn hor_vert_lines(lines: Vec<Line>) -> Vec<Line> {
     lines
         .iter()
         .filter(|line| line.0.0 == line.1.0 || line.0.1 == line.1.1)
-        .map(|l| *l)
+        .copied()
         .collect()
 }
 
 
 /// Returns the outer points of the map on the format ((x_min, x_max), (y_min, y_max)
-fn map(lines: &Vec<((i64, i64), (i64, i64))>) -> ((i64, i64), (i64, i64)) {
+fn map(lines: &[Line]) -> (Point, Point) {
     let mut xs: Vec<i64> = lines.iter().flat_map(|line| vec![line.0.0, line.1.0]).collect();
     let mut ys: Vec<i64> = lines.iter().flat_map(|line| vec![line.0.1, line.1.1]).collect();
-    xs.sort();
-    ys.sort();
+    xs.sort_unstable();
+    ys.sort_unstable();
     ((*xs.first().unwrap(), *xs.last().unwrap()), (*ys.first().unwrap(), *ys.last().unwrap()))
 }
 
-fn points(map: ((i64, i64), (i64, i64))) -> Vec<i64> {
+fn points(map: (Point, Point)) -> Vec<i64> {
     let xs = map.0.1 /*- map.0.0*/ + 1;
     let ys = map.1.1 /*- map.1.0*/ + 1;
     [0].repeat((xs * ys) as usize)

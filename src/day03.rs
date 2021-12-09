@@ -14,8 +14,8 @@ impl Solver for Day {
 }
 
 fn epsilon_gamma(inp: &str) -> (u32, u32, u32, u32) {
-    let num_columns = inp.split("\n").map(|s| s.trim()).collect::<Vec<&str>>().first().unwrap().len();
-    let lines = inp.split("\n").map(|s| s.trim());
+    let num_columns = inp.split('\n').map(|s| s.trim()).collect::<Vec<&str>>().first().unwrap().len();
+    let lines = inp.split('\n').map(|s| s.trim());
     let values: Vec<u32> = lines
         .map(|l| u32::from_str_radix(l, 2).unwrap())
         .collect();
@@ -31,7 +31,7 @@ fn epsilon_gamma(inp: &str) -> (u32, u32, u32, u32) {
     (epsilon, gamma, oxygen_generator_rating, scrubber_rating)
 }
 
-fn rating(values: &Vec<u32>, column: usize, cmp: fn(u32, usize) -> u32) -> u32 {
+fn rating(values: &[u32], column: usize, cmp: fn(u32, usize) -> u32) -> u32 {
     if values.len() == 1 || column == 0 {
         *values.first().unwrap()
     } else {
@@ -50,8 +50,7 @@ fn rating(values: &Vec<u32>, column: usize, cmp: fn(u32, usize) -> u32) -> u32 {
             .filter(|(shift, _)| *shift == should_equal)
             .map(|v| v.1)
             .collect();
-        let generator_rating = rating(&filtered, column - 1, cmp);
-        generator_rating
+        rating(&filtered, column - 1, cmp)
     }
 }
 
@@ -59,7 +58,7 @@ pub(crate) fn input() -> &'static str {
     include_str!("input03.txt").trim()
 }
 
-fn mask(values: &Vec<u32>, columns: usize, cmp: fn(num_ones: u32, num_values: usize) -> u32) -> u32 {
+fn mask(values: &[u32], columns: usize, cmp: fn(num_ones: u32, num_values: usize) -> u32) -> u32 {
     if columns < 1 {
         0
     } else {
@@ -98,7 +97,7 @@ mod tests {
 
     #[test]
     fn test_mask() {
-        let lines = example_input().split("\n").map(|s| s.trim());
+        let lines = example_input().split('\n').map(|s| s.trim());
         let values: Vec<u32> = lines
             .map(|l| u32::from_str_radix(l, 2).unwrap())
             .collect();

@@ -13,3 +13,6 @@ My solutions for [Advent of Code 2021](https://adventofcode.com/2021).
 ## Run tests
 
     cargo test --release
+## Lint
+
+    cargo clippy
