@@ -5,17 +5,11 @@ pub struct Day {}
 impl Solver for Day {
     fn pt1(&self, inp: &str) -> String {
         let mut game = Game::new(inp);
-        match game.solve() {
-            None => 0,
-            Some(scores) => scores.0
-        }.to_string()
+        game.solve().first().unwrap().to_string()
     }
     fn pt2(&self, inp: &str) -> String {
         let mut game = Game::new(inp);
-        match game.solve() {
-            None => 0,
-            Some(scores) => scores.1
-        }.to_string()
+        game.solve().last().unwrap().to_string()
     }
 }
 
@@ -84,26 +78,23 @@ struct Game {
 }
 
 impl Game {
-    fn solve(&mut self) -> Option<(u32, u32)> {
-        let mut winner: Option<u32> = Option::None;
+    fn solve(&mut self) -> Vec<u32> {
+        let mut scores: Vec<u32> = vec![];
         for number in &self.numbers {
             for i in 0..self.boards.len() {
                 let board = self.boards.get_mut(i).unwrap();
-                let board_score = board.draw(*number);
-                let unfinished_boards = self.boards.iter().filter(|board| !board.solved).count();
-
-                match board_score {
-                    None => {}
-                    Some(score) => match winner {
-                        None => winner = Option::Some(number * score),
-                        Some(_) => if unfinished_boards == 0 {
-                            return Some((winner.unwrap(), number * score));
+                if !board.solved {
+                    if let Some(score) = board.draw(*number) {
+                        scores.push(number * score);
+                        let finished = scores.len() == self.boards.len();
+                        if finished {
+                            return scores;
                         }
                     }
                 }
             }
         }
-        Option::None
+        vec![]
     }
 
     fn new(inp: &str) -> Game {
@@ -267,7 +258,7 @@ mod tests {
     #[test]
     fn test_game_solve() {
         let actual = Game::new(example_input()).solve();
-        assert_eq!(actual, Some((4512, 1924)));
+        assert_eq!(actual, vec![4512, 2192, 1924]);
     }
 
     #[test]
