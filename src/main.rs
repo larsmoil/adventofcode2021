@@ -32,10 +32,10 @@ fn main() {
             _ => panic!("Invalid day!")
         };
         let now = Instant::now();
-        println!("day{:02} - pt1: {} ({:.2?})", day, d.pt1(inp), now.elapsed());
+        println!("day{:02} - pt1: {:>15} ({:.2?})", day, d.pt1(inp), now.elapsed());
 
         let now = Instant::now();
-        println!("day{:02} - pt2: {} ({:.2?})", day, d.pt2(inp), now.elapsed());
+        println!("day{:02} - pt2: {:>15} ({:.2?})", day, d.pt2(inp), now.elapsed());
     }
     println!("total: {:.2?}", now.elapsed());
 }
