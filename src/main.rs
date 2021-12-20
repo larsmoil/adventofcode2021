@@ -11,6 +11,7 @@ mod day09;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
 
 use std::ops::RangeInclusive;
 use std::time::Instant;
@@ -19,7 +20,7 @@ use crate::problem::Solver;
 
 fn main() {
     let now = Instant::now();
-    for day in RangeInclusive::new(1, 12) {
+    for day in RangeInclusive::new(1, 13) {
         let (d, inp): (&dyn Solver, &str) = match day {
             1 => (&day01::Day {}, day01::input()),
             2 => (&day02::Day {}, day02::input()),
@@ -33,6 +34,7 @@ fn main() {
             10 => (&day10::Day {}, day10::input()),
             11 => (&day11::Day {}, day11::input()),
             12 => (&day12::Day {}, day12::input()),
+            13 => (&day13::Day {}, day13::input()),
             _ => panic!("Invalid day!")
         };
         let now = Instant::now();
